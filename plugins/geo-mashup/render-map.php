@@ -304,7 +304,7 @@ class GeoMashupRenderMap {
 
 			wp_register_style(
 					'leaflet',
-					'//cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/leaflet.css',
+					'//map.birtakimseyler.com/wp-content/themes/map-child/css/leaflet.css',
 					null,
 					'0.6.4' );
 
