@@ -29,13 +29,14 @@
 		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
 	<title>Map</title>
 		<?php GeoMashupRenderMap::head(); ?>
+		<script type="text/javascript" src="https://api.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.2.0/leaflet-omnivore.min.js"></script>
 		<style type="text/css">
 			v\:* { behavior:url(#default#VML); }
 			#geo-mashup {
 				width:100%;
 				height:100%;
 			}
-		</style>
+		</style>	
 	</head>
 	<body>
 	<div id="geo-mashup" class="<?php echo GeoMashupRenderMap::map_property( 'name' ); ?>">

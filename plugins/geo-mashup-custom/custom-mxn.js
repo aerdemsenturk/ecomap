@@ -6,7 +6,7 @@
 // 	}
 // } );
 
-// BYPASS MXN
+// BYPASS MXN Leaflet 0.7.7 de hata var 1.5.1 sürümünde hata vermiyor
 
 GeoMashup.addAction( 'loadedMap', function ( properties, mxn ) {
 	var leaflet_map = mxn.getMap();
@@ -15,18 +15,53 @@ GeoMashup.addAction( 'loadedMap', function ( properties, mxn ) {
 	L.control.scale().addTo(leaflet_map);
 
 // Add Cities Control	
-	var cities = L.layerGroup();
+	// var cities = L.layerGroup();
 
-	L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.').addTo(cities),
-	L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.').addTo(cities),
-	L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.').addTo(cities),
-	L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.').addTo(cities);
+	// L.marker([39.61, -105.02]).bindPopup('This is Littleton, CO.').addTo(cities),
+	// L.marker([39.74, -104.99]).bindPopup('This is Denver, CO.').addTo(cities),
+	// L.marker([39.73, -104.8]).bindPopup('This is Aurora, CO.').addTo(cities),
+	// L.marker([39.77, -105.23]).bindPopup('This is Golden, CO.').addTo(cities);
 
-	var overlays = {
-		"Cities": cities
-	};
+	// var overlays = {
+	// 	"Cities": cities
+	// };
 
-	L.control.layers(null, overlays, {position: 'bottomleft'}).addTo(leaflet_map)
+	// L.control.layers(null, overlays, {position: 'bottomleft'}).addTo(leaflet_map);
+
+// Add Önemli Doğa Alanları geojson
+	var odastyle = L.geoJson(null, {
+		style: function(feature) {
+			return { color: '#ff0', fillOpacity: 0.3, weight: 0, };
+		}
+	});
+
+	var odalayer = omnivore.geojson('oda.geojson', null, odastyle)
+    .on('ready', function() {
+        //setView geojson dosyaya göre ayarlansın
+        //map.fitBounds(odaLayer.getBounds());
+        odalayer.eachLayer(function(layer) {
+            layer.bindPopup(layer.feature.properties.name + '<br/>' + layer.feature.properties.description);
+        });
+    });
+
+// Add Safecast Tile Layer https://blog.safecast.org/
+	// var safecast_tile = L.tileLayer('https://s3.amazonaws.com/te512.safecast.org/{z}/{x}/{y}.png',{
+	// attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Map style: &copy; <a href="https://blog.safecast.org/about/">SafeCast</a> (<a href="https://creativecommons.org/licenses/by-sa/3.0/">CC-BY-SA</a>)',
+	// });
+
+// Add ODA Tile Layer from Mapbox
+	var oda_tile = L.tileLayer('https://api.mapbox.com/styles/v1/birtakimseyler/ck0avq37232u91clrl5u4j4dt/tiles/512/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmlydGFraW1zZXlsZXIiLCJhIjoiY2swM3lvamFiMDVrMTNjcW9tc2luM2o2NiJ9.w56EV1qK69eejEQgVkWqzA',{
+	attribution: 'ECO DATA - <a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox</a> <a class="mapbox-improve-map" href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
+	});
+
+// Bu özellikler çalışmıyor
+	// leaflet_map.on('baselayerchange', function() { safecast_tile.bringToFront(); } ); // baselayer değiştirince safecast_tile en öne gelsin. //https://leafletjs.com/reference-0.7.7.html#map-baselayerchange
+	// leaflet_map.on('baselayerchange', function() { oda_tile.bringToFront(); } ); // baselayer değiştirince oda_tile en öne gelsin. //https://leafletjs.com/reference-0.7.7.html#map-baselayerchange
+	// leaflet_map.on('layeradd', function() { oda_tile.bringToFront(); } ); // Layer ekleyince değiştirince oda_tile en öne gelsin. //https://leafletjs.com/reference-0.7.7.html#map-baselayerchange
+
+	// L.control.layers(null, { "Safecast": safecast_tile }).addTo(leaflet_map);
+	// L.control.layers(null, { "ODA": odalayer, "Önemli Doğa Alanları": oda_tile }).addTo(leaflet_map);
+	L.control.layers(null, { "Önemli Doğa Alanları": odalayer }).addTo(leaflet_map);
 
 // Add image
 	// L.Control.Watermark = L.Control.extend({
@@ -52,7 +87,7 @@ GeoMashup.addAction( 'loadedMap', function ( properties, mxn ) {
 	
 } );
 
-// GEO MASHUP
+// MXN geo-mashup/js/geo-mashup-mxn.js
 
 GeoMashup.loadFullPost = function( point ) {
 	var i,
@@ -482,6 +517,7 @@ GeoMashup.createMap = function( container, opts ) {
 
 };
 
+// LEAFLET CORE geo-mashup/js/mxn/mxn.leaflet.core.js
 
 mxn.register('leaflet', {
 
@@ -530,33 +566,41 @@ mxn.register('leaflet', {
 				map_type: null
 			};
 	
-			this.road_tile = {
-				name: 'Roads',
+			this.earth_tile = {
+				name: 'Earth',
+				attribution: 'ECO DATA - Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community</a>',
+				url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
+			};
+
+			// this.satellite_tile = {
+			// 	name: 'Satellite',
+			// 	attribution: 'Anadolu Yazıları - <a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox</a> <a class="mapbox-improve-map" href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
+			// 	url: 'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/512/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYmlydGFraW1zZXlsZXIiLCJhIjoiY2o3a3Fla2dsMmc3ejJ3dXd0b25hMWFhZCJ9.LsUkeLXlFCOyKHpMbd0yew'
+			// };
+			
+			this.terrain_tile = {
+				name: 'Terrain',
 				attribution: 'ECO DATA - <a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox</a> <a class="mapbox-improve-map" href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
-				url: 'https://api.mapbox.com/styles/v1/mapbox/satellite-v9/tiles/512/{z}/{x}/{y}@2x?access_token=pk.eyJ1IjoiYmlydGFraW1zZXlsZXIiLCJhIjoiY2swM3lvamFiMDVrMTNjcW9tc2luM2o2NiJ9.w56EV1qK69eejEQgVkWqzA'
+				url: 'https://api.mapbox.com/styles/v1/birtakimseyler/ck0bhif9o3ytf1cqhkn9frwky/tiles/512/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmlydGFraW1zZXlsZXIiLCJhIjoiY2swM3lvamFiMDVrMTNjcW9tc2luM2o2NiJ9.w56EV1qK69eejEQgVkWqzA'
 			};
 	
-			this.satellite_tile = {
-				name: 'Satellite',
-				attribution: 'ECO DATA - <a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox</a> <a class="mapbox-improve-map" href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
-				url: 'https://api.mapbox.com/styles/v1/birtakimseyler/cjfjr5jb7fsqh2snsf6f1zb3h/tiles/512/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmlydGFraW1zZXlsZXIiLCJhIjoiY2swM3lvamFiMDVrMTNjcW9tc2luM2o2NiJ9.w56EV1qK69eejEQgVkWqzA'
+			this.osm_tile = {
+				name: 'Osm',
+				attribution: 'ECO DATA - &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+				url: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png'
 			};
 	
-			this.third_tile = {
-				name: 'Third',
-				attribution: 'ECO DATA - <a href="https://www.mapbox.com/about/maps/" target="_blank">&copy; Mapbox</a> <a class="mapbox-improve-map" href="https://www.mapbox.com/map-feedback/" target="_blank">Improve this map</a>',
-				url: 'https://api.mapbox.com/styles/v1/birtakimseyler/cjfjrnplje91x2rnytnfo5bi3/tiles/512/{z}/{x}/{y}?access_token=pk.eyJ1IjoiYmlydGFraW1zZXlsZXIiLCJhIjoiY2swM3lvamFiMDVrMTNjcW9tc2luM2o2NiJ9.w56EV1qK69eejEQgVkWqzA'
-			};
-	
+			// var subdomains = 'abc';
+			// this.addTileLayer (this.earth_tile.url, 1.0, this.earth_tile.name, this.earth_tile.attribution, 0, 19, true, subdomains);
+			// this.addTileLayer (this.terrain_tile.url, 1.0, this.terrain_tile.name, this.terrain_tile.attribution, 0, 19, true);
+			// this.addTileLayer (this.osm_tile.url, 1.0, this.osm_tile.name, this.osm_tile.attribution, 0, 19, true);
 			
 			var subdomains = 'abc';
-			this.addTileLayer (this.road_tile.url, 1.0, this.road_tile.name, this.road_tile.attribution, 0, 19, true, subdomains);
-			this.addTileLayer (this.satellite_tile.url, 1.0, this.satellite_tile.name, this.satellite_tile.attribution, 0, 18, true);
-			this.addTileLayer (this.third_tile.url, 1.0, this.third_tile.name, this.third_tile.attribution, 0, 18, true);
+			this.addTileLayer (this.earth_tile.url, 1.0, this.earth_tile.name, this.earth_tile.attribution);
+			this.addTileLayer (this.terrain_tile.url, 1.0, this.terrain_tile.name, this.terrain_tile.attribution);
+			this.addTileLayer (this.osm_tile.url, 1.0, this.osm_tile.name, this.osm_tile.attribution);
 	
-			
-	
-			this.currentMapType = mxn.Mapstraction.ROAD;
+			this.currentMapType = mxn.Mapstraction.EARTH;
 	
 			this.loaded[api] = true;
 		},
@@ -727,11 +771,6 @@ mxn.register('leaflet', {
 				case mxn.Mapstraction.SATELLITE:
 					this.layers[this.satellite_tile.name].bringToFront();
 					this.currentMapType = mxn.Mapstraction.SATELLITE;
-					break;
-	
-				case mxn.Mapstraction.THIRD:
-					this.layers[this.third_tile.name].bringToFront();
-					this.currentMapType = mxn.Mapstraction.THIRD;
 					break;
 	
 				case mxn.Mapstraction.HYBRID:
