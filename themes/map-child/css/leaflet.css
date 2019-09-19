@@ -132,3 +132,12 @@
 .leaflet-oldie .leaflet-popup-content-wrapper,
 .leaflet-oldie .leaflet-popup-tip{border:1px solid #999;}
 .leaflet-div-icon{background:#fff;border:1px solid #666;}
+
+/* ECO MAP
+https://stackoverflow.com/questions/33421720/how-can-i-select-a-specific-instance-of-an-element-inside-a-div-using-css/33421754
+*/
+
+.leaflet-control-layers:nth-child(2) a {
+    background-image: url(https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-icon-2x.png);
+    background-size: 26px 26px;
+}
