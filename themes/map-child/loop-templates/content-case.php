@@ -9,7 +9,7 @@
 
 <article <?php post_class(); ?> id="post-<?php the_ID(); ?>">
 
-<div class="toggle-content" onclick="togglecontent()">↵</div>
+	<div class="toggle-content" onclick="togglecontent()">↵</div>
 
 	<div class="entry-content">
 		
@@ -20,12 +20,24 @@
 				<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
 				
 				<p>
-				<?php echo get_the_term_list( $post->ID, 'case_type', '● ', ', ' ); ?>
+				<?php
+					// Farklı yöntem
+					// echo get_the_term_list( $post->ID, 'case_type', '● ', ', ' ); 
+
+					$case_type = get_the_terms( $post->ID,  'case_type' );
+					if ( ! empty( $case_type ) ) {
+						if ( ! is_wp_error( $case_type ) ) {
+								foreach( $case_type as $type ) {
+									echo '<small><a href="' . get_term_link( $type->slug, 'case_type' ) . '">●&nbsp;' . esc_html( $type->name ) . '&nbsp;</a></small>'; 
+								}
+						}
+					}
+				?>
 				</p>
 
 				<?php the_content(); ?>
 
-				<?php if( get_field('spatial_country') ): ?>
+				<!-- <?php if( get_field('spatial_country') ): ?>
 				<?php the_field('spatial_country'); ?>, 
 				<?php endif; ?>
 
@@ -35,139 +47,222 @@
 
 				<?php if( get_field('spatial_city') ): ?>
 				<?php the_field('spatial_city'); ?>
-				<?php endif; ?>
+				<?php endif; ?> -->
 
 				</br>
 
 				<?php the_field('geo_address'); ?>
+				
 				</br>
 
 				<?php if( get_field('temporal_start') ): ?>
-				<?php the_field('temporal_start'); ?> — <?php the_field('temporal_end'); ?>
+				<?php the_field('temporal_start'); ?> — 
 				<?php endif; ?>
+
+				<?php if( get_field('temporal_end') ): ?>
+				<?php the_field('temporal_end'); ?>			
+				<?php else : ?>
+					TODAY
+				<?php endif; ?>
+
+				<!-- <?php 
+				// get raw date
+				$date = get_field('temporal_start', false, false);
+				// make date object
+				$date = new DateTime($date);
+				?>
+				</br>
+				<?php echo $date->format('j M Y'); ?> — <?php echo date("j M Y");?> -->
 
 				<div class="row">
 					<!--COMMODITY-->
-					<div class="col-12 mt-5 mb-3">
-						<h4>COMMODITY</h4>
-					</div>
-
 					<div class="col-lg-12 col-md-12 col-sm-12 col-12">
 
 						<?php	
-								$types = get_terms( array( 
-									'taxonomy' => 'commodity', 
-									'hide_empty' => true, ) 
-								);
+						$types = get_terms( array( 
+							'taxonomy' => 'commodity', 
+							'hide_empty' => true, ) 
+						);
 
-								foreach($types as $type) {
+						foreach($types as $type) {
 
-									$term_link = get_term_link( $type );
-									$image = get_field('commodity_image', 'commodity_' . $type->term_id . '' );
-					
-									if ( has_term( $type->term_id, 'commodity')) {
-										echo '<div class="img-container d-inline-block">';
-										echo '<a href="' . esc_url( $term_link ) . '">';
-										echo '<img class="image rounded-circle" src="' . $image['sizes']['thumbnail'] . '" alt="' . $type->name .'"></a>'; 
+							$term_link = get_term_link( $type );
+							$image = get_field('commodity_image', 'commodity_' . $type->term_id . '' );
+			
+							if ( has_term( $type->term_id, 'commodity')) {
+								echo '<div class="img-container d-inline-block">';
+								echo '<a href="' . esc_url( $term_link ) . '">';
+								echo '<img class="image rounded-circle" src="' . $image['sizes']['thumbnail'] . '" alt="' . $type->name .'"></a>'; 
 
-										echo '<div class="overlay rounded-circle"><a class="text" href="' . esc_url( $term_link ) . '">' . $type->name .'</a></div></div>';
-									}
-								} 
+								echo '<div class="overlay rounded-circle"><a class="text" href="' . esc_url( $term_link ) . '">' . $type->name .'</a></div></div>';
+							}
+						} 
 						?>
 
 					</div>
 
-					<!--ACTORS 2 PRO CONTRA-->
+					<!--OLD ACTORS PRO CONTRA GROUP VERSION https://trello.com/c/D0THOFCk -->
+					<!--NEW ACTOR POST TYPE VERSION -->
+
+					<?php if( $posts ): ?>	
+					<?php foreach( $posts as $post ): ?>
+						<div class="col-12 mt-5 mb-3">
+							<?php 
+							$actors_pro = get_field('actor_relations_pro');
+							$actors_contra = get_field('actor_relations_contra');
+							?>
+
+							<?php if( $actors_pro ): ?>
+								<h4>ACTORS PRO</h4>
+								<ul>
+								<?php foreach( $actors_pro as $actor_pro ): ?>
+									<li>
+										<a href="<?php echo get_permalink( $actor_pro->ID ); ?>">
+											<?php echo get_the_title( $actor_pro->ID ); ?>
+										</a>
+										<small>
+										<?php
+											// Basit yöntem
+											echo get_the_term_list( $actor_pro->ID, 'actor_type', '', ', ' );
+											echo get_the_term_list( $actor_pro->ID, 'actor_country', ' - ', ', ' ); 
+
+											// Başka yöntem
+
+											// $actor_type = get_the_terms( $actor_contra->ID,  'actor_type' );
+											// if ( ! empty( $actor_type ) ) {
+											// 	if ( ! is_wp_error( $actor_type ) ) {
+											// 			foreach( $actor_type as $type ) {
+											// 				echo '<small><a href="' . get_term_link( $type->slug, 'actor_type' ) . '">●&nbsp;' . esc_html( $type->name ) . '&nbsp;</a></small>'; 
+											// 			}
+											// 	}
+											// }
+										?>
+										</small>
+									</li>
+								<?php endforeach; ?>
+								</ul>
+							<?php endif; ?>
+
+							<?php if( $actors_contra ): ?>
+								<h4>ACTORS CONTRA</h4>
+								<ul>
+								<?php foreach( $actors_contra as $actor_contra ): ?>
+									<li>
+										<a href="<?php echo get_permalink( $actor_contra->ID ); ?>">
+											<?php echo get_the_title( $actor_contra->ID ); ?>
+										</a>
+										<small>
+										<?php
+											// Basit yöntem
+											echo get_the_term_list( $actor_contra->ID, 'actor_type', '', ', ' );
+											echo get_the_term_list( $actor_contra->ID, 'actor_country', ' - ', ', ' ); 
+
+											// Başka yöntem
+
+											// $actor_type = get_the_terms( $actor_contra->ID,  'actor_type' );
+											// if ( ! empty( $actor_type ) ) {
+											// 	if ( ! is_wp_error( $actor_type ) ) {
+											// 			foreach( $actor_type as $type ) {
+											// 				echo '<small><a href="' . get_term_link( $type->slug, 'actor_type' ) . '">●&nbsp;' . esc_html( $type->name ) . '&nbsp;</a></small>'; 
+											// 			}
+											// 	}
+											// }
+										?>
+										</small>
+									</li>
+								<?php endforeach; ?>
+								</ul>
+							<?php endif; ?>
+						</div>
+					<?php endforeach; ?>
+					<?php endif; ?>
+
+					<!--IMPACT GROUPED-->
+					<div class="col-12">
+						<h4>IMPACT</h4>
+					</div>
+
 					<div class="col-12 mt-5 mb-3">
-						<h3>ACTORS</h43>
-					</div>
+						<ul>
+							<?php
+								if (have_rows('impact_visible')) {
+									while (have_rows('impact_visible')) {
 
-					<div class="mt-5 mb-3 col-lg-6 col-md-12 col-sm-12">
-						<?php
-						
-							if (have_rows('actor_pro2')) {
-								while (have_rows('actor_pro2')) {
+										the_row();
+										$healths = get_sub_field('impact_visible_health');
+										$socials = get_sub_field('impact_visible_social');
+										$environmentals = get_sub_field('impact_visible_environmental');
 
-									the_row();
-									$finances = get_sub_field('finance');
-									$goverments = get_sub_field('goverment');
-									$companies = get_sub_field('company');
+										if( $healths ):
 
-									if( $goverments ):
+										foreach ($healths as $health) {			
+											echo '<li><a href="' . get_term_link( $health ) . '">' . $health->name . '</a> - <i> Health </i></li>';
+										}
 
-									foreach ($goverments as $goverment) {
+										endif;
+										if( $socials ):
 
-										echo '<ul>';
-										echo '<li><a href="' . get_term_link( $goverment ) . '">' . $goverment->name . '</a> - <i> Goverment </i></li></li>';
-										echo '</ul>';
+										foreach ($socials as $social) {
+											echo '<li><a href="' . get_term_link( $social ) . '">' . $social->name . '</a> - <i> Social </i></li>';
+										}
 
+										endif;
+										if( $environmentals ):
+
+										foreach ($environmentals as $environmental) {
+											echo '<li><a href="' . get_term_link( $environmental ) . '">' . $environmental->name . '</a> - <i> Ennvironmental </i></li>';
+										}
+		
+										endif;
 									}
-
-									endif;
-									if( $companies ):
-
-									foreach ($companies as $company) {
-
-										echo '<ul>';
-										echo '<li><a href="' . get_term_link( $company ) . '">' . $company->name . '</a> - <i> Company </i></li></li>';
-										echo '</ul>';
-
-									}
-
-									endif;
-									if( $finances ):
-
-									foreach ($finances as $finance) {
-
-										echo '<ul>';
-										echo '<li><a href="' . get_term_link( $finance ) . '">' . $finance->name . '</a> - <i> Finance </i></li></li>';
-										echo '</ul>';
-				
-									}
-									endif;
 								}
-							}
-
-						?>
+							?>
+						</ul>
 					</div>
 
-					<div class="mt-5 mb-3 col-lg-6 col-md-12 col-sm-12">
-						<?php
-							
-							if (have_rows('actor_contra2')) {
-								while (have_rows('actor_contra2')) {
+					<div class="col-12 mt-5 mb-3">
+						<ul>
+							<?php
+								if (have_rows('impact_potential')) {
+									while (have_rows('impact_potential')) {
 
-									the_row();
-									$non_goverments = get_sub_field('non-goverment');
+										the_row();
+										$healths = get_sub_field('impact_potential_health');
+										$socials = get_sub_field('impact_potential_social');
+										$environmentals = get_sub_field('impact_potential_environmental');
 
+										if( $healths ):
 
-									if( $non_goverments ):
+										foreach ($healths as $health) {			
+											echo '<li><a href="' . get_term_link( $health ) . '">' . $health->name . '</a> - <i> Health </i></li>';
+										}
 
-									foreach ($non_goverments as $non_goverment) {
+										endif;
+										if( $socials ):
 
-										echo '<ul>';
-										echo '<li><a href="' . get_term_link( $non_goverment ) . '">' . $non_goverment->name . '</a> - <i> Goverment </i></li></li>';
-										echo '</ul>';
+										foreach ($socials as $social) {
+											echo '<li><a href="' . get_term_link( $social ) . '">' . $social->name . '</a> - <i> Social </i></li>';
+										}
 
+										endif;
+										if( $environmentals ):
+
+										foreach ($environmentals as $environmental) {
+											echo '<li><a href="' . get_term_link( $environmental ) . '">' . $environmental->name . '</a> - <i> Ennvironmental </i></li>';
+										}
+		
+										endif;
 									}
-
-									endif;
-							
 								}
-							}
-
-						?>
+							?>
+						</ul>
 					</div>
 
-					<!--CASE ARCHIVE-->
+					<!--TIMELINE CASE ARCHIVE-->
 					<div class="col-12 mt-5 mb-3">
 
 						<?php if( have_rows('case_timeline') ): ?>
-
-							<div class="mb-3 ">
-								<h4>TIMELINE</h4>
-							</div>
-
+							<h4>TIMELINE</h4>
 							<ul class="timeline">
 
 								<?php while( have_rows('case_timeline') ): the_row(); 
@@ -212,11 +307,10 @@
 								<?php endwhile; ?>
 
 							</ul>
-
 						<?php endif; ?>
 
 					</div>
-
+					<!--DOCUMENTATION CASE ARCHIVE-->
 					<div class="col-12 mt-5 mb-3">   
 
 						<?php if( have_rows('case_documents') ): ?>
@@ -287,6 +381,16 @@ function togglecontent() {
 		x.style.display = "none";
 	}
 }
+
+//Tooltip 
+jQuery(function () {
+	jQuery('[data-toggle="tooltip"]').tooltip(
+		{
+		placement: 'right', 
+		animation: false, //https://github.com/twbs/bootstrap/issues/21607#issuecomment-309634023
+		}
+	)
+})
 
 // jQuery version
 
