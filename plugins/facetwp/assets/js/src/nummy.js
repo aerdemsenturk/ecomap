@@ -29,23 +29,17 @@
             abbr = '';
 
         if ( -1 < format.indexOf( 'a' ) ) {
-            var abs = Math.abs( value );
-            if ( abs >= Math.pow( 10, 12 ) ) {
-                value = value / Math.pow( 10, 12 );
-                abbr += 't';
+            // Kısaltmaları kaldır
+            // var abbrevs = [ 'K', 'M', 'B', 't', 'q', 'Q' ];
+            var abbrevs = [ '', '', '', '', '', '' ];
+            var exp = Math.floor( Math.log10( Math.abs( value ) ) );
+            var nearest_exp = ( exp - ( exp % 3 ) ); // nearest exponent divisible by 3
+
+            if ( 3 <= exp ) {
+                value = value / Math.pow( 10, nearest_exp );
+                abbr += abbrevs[ Math.floor( exp / 3 ) - 1 ];
             }
-            else if ( abs < Math.pow( 10, 12 ) && abs >= Math.pow( 10, 9 ) ) {
-                value = value / Math.pow( 10, 9 );
-                abbr += 'b';
-            }
-            else if ( abs < Math.pow( 10, 9 ) && abs >= Math.pow( 10, 6 ) ) {
-                value = value / Math.pow( 10, 6 );
-                abbr += 'm';
-            }
-            else if ( abs < Math.pow( 10, 6 ) && abs >= Math.pow( 10, 3 ) ) {
-                value = value / Math.pow( 10, 3 );
-                abbr += 'k';
-            }
+
             format = format.replace( 'a', '' );
         }
 
@@ -68,7 +62,9 @@
         decimalStr = valueStr.split( '.' )[1] || '';
 
         // Handle decimals
-        decimalStr = ( 0 < precision && '' != decimalStr ) ? '.' + decimalStr : '';
+        // Noktayı kaldır
+        // decimalStr = ( 0 < precision && '' != decimalStr ) ? '.' + decimalStr : '';
+        decimalStr = ( 0 < precision && '' != decimalStr ) ? '' + decimalStr : '';
 
         // Use thousands separators
         if ( -1 < format.indexOf( ',' ) ) {
