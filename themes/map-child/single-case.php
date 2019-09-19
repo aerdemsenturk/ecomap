@@ -1,8 +1,8 @@
 <?php
 /**
- * The template for displaying all single posts.
- * Template Name: 12
- * Template Post Type: script_item
+ * Single Case Template
+ * Template Name: Case
+ * Template Post Type: case
  *
  * @package understrap
  */

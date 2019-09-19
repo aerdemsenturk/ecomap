@@ -1,8 +1,8 @@
 <?php
 /**
- * The template for displaying all single posts.
- * Template Name: 12
- * Template Post Type: actor2
+ * Single Actor Template
+ * Template Name: Actor
+ * Template Post Type: actor_post
  *
  * @package understrap
  */
@@ -14,15 +14,12 @@ get_header();
 
 	<div class="container-fluid" id="content" tabindex="-1">
 
-
 		<main class="site-main" id="main">
 			<?php while ( have_posts() ) : the_post(); ?>
 
 				<?php get_template_part( 'loop-templates/content', 'actor' ); ?>
-			
+
 			<?php endwhile; // end of the loop. ?>
-
-
 
 		</main><!-- #main -->
 
