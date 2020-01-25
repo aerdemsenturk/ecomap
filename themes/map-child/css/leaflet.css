@@ -35,7 +35,7 @@
 .leaflet-control{position:relative;z-index:7;pointer-events:auto;}
 .leaflet-top,
 .leaflet-bottom{position:absolute;z-index:1000;pointer-events:none;}
-.leaflet-top{top:0;}
+.leaflet-top{top:60px;}
 .leaflet-right{right:0;}
 .leaflet-bottom{bottom:0;}
 .leaflet-left{left:0;}
@@ -44,7 +44,7 @@
 .leaflet-top .leaflet-control{margin-top:10px;}
 .leaflet-bottom .leaflet-control{margin-bottom:10px;}
 .leaflet-left .leaflet-control{margin-left:10px;}
-.leaflet-right .leaflet-control{margin-right:10px;}
+.leaflet-right .leaflet-control{margin-right:10px;text-align:right;}
 .leaflet-fade-anim .leaflet-tile,
 .leaflet-fade-anim .leaflet-popup{opacity:0;-webkit-transition:opacity 0.2s linear;-moz-transition:opacity 0.2s linear;-o-transition:opacity 0.2s linear;transition:opacity 0.2s linear;}
 .leaflet-fade-anim .leaflet-tile-loaded,
@@ -61,10 +61,10 @@
 .leaflet-dragging .leaflet-container,
 .leaflet-dragging .leaflet-clickable{cursor:move;cursor:-webkit-grabbing;cursor:-moz-grabbing;}
 .leaflet-container{background:black;outline:0;}
-.leaflet-container a{color: black;}
+.leaflet-container a{color: black; text-decoration: none;}
 .leaflet-container a.leaflet-active{outline:2px solid orange;}
 .leaflet-zoom-box{border:2px dotted #38f;background:rgba(255,255,255,0.5);}
-.leaflet-container{font:12px/1.5 'Work Sans', Helvetica, sans-serif;}
+.leaflet-container{font:12px/1.5 'untitled', Helvetica, sans-serif;}
 .leaflet-bar{border-radius:0px;}
 .leaflet-bar a,
 .leaflet-bar a:hover{width:40px;height:40px;line-height:38px;display:block;text-align:center;text-decoration:none;color:black;}
@@ -87,13 +87,16 @@
 .leaflet-control-layers .leaflet-control-layers-list,
 .leaflet-control-layers-expanded .leaflet-control-layers-toggle{display:none;}
 .leaflet-control-layers-expanded .leaflet-control-layers-list{display:block;position:relative;}
-.leaflet-control-layers-expanded{padding:6px 10px 6px 6px;color:black;background:white; border: 1px solid black;}
-.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px;}
+.leaflet-control-layers-expanded{padding:6px 10px 12px 6px;color:black;background: transparent; border-bottom: 1px solid black;}
+/*.leaflet-control-layers-selector{margin-top:2px;position:relative;top:1px;}*/
+.leaflet-control-layers-selector{display:none;}
 
 [type="radio"]:not(:checked),
 [type="radio"]:checked {display:none;}
 
 .leaflet-control-layers label{display:block;}
+.leaflet-control-layers label:hover{color:red;}
+
 .leaflet-control-layers-separator{height:0;border-top:1px solid black;margin:5px -10px 5px -6px;}
 .leaflet-container .leaflet-control-attribution{background:none;margin:0;}
 .leaflet-control-attribution,
@@ -103,7 +106,7 @@
 .leaflet-container .leaflet-control-attribution,
 .leaflet-container .leaflet-control-scale{font-size:11px;}
 .leaflet-left .leaflet-control-scale{margin-left:5px;}
-.leaflet-bottom .leaflet-control-scale{margin-bottom:5px;}
+.leaflet-bottom .leaflet-control-scale{margin-bottom:5px; margin-left:10px;}
 .leaflet-control-scale-line{color:black;border:2px solid black; border-top:none;line-height:1.1;padding:2px 5px 1px;font-size:11px;white-space:nowrap;overflow:hidden;-moz-box-sizing:content-box;box-sizing:content-box; background:none;}
 .leaflet-control-scale-line:not(:first-child){border-top:2px solid black;border-bottom:none;margin-top:-2px;}
 .leaflet-control-scale-line:not(:first-child):not(:last-child){border-bottom:2px solid black;}
@@ -113,14 +116,15 @@
 .leaflet-touch .leaflet-control-layers,
 .leaflet-touch .leaflet-bar{background-clip:padding-box;}
 .leaflet-popup{position:absolute;text-align:center;}
-.leaflet-popup-content-wrapper{padding:0;text-align:left;border-radius:0px;}
+.leaflet-popup-content-wrapper{padding:2px;text-align:left;border-radius:0px;margin:45px 45px 0px 45px;}
 .leaflet-popup-content{margin:0px 0px 0px 0px;line-height:auto;}
 .leaflet-popup-content p{margin:0px 0;}
-.leaflet-popup-content h2{font-size:18px;}
+.leaflet-popup-content h2{font-size: 18px;font-weight: normal;margin: 0;}
 .leaflet-popup-tip-container{margin:0 auto;width:0px;height:0px;position:relative;overflow:hidden;}
 .leaflet-popup-tip{width:0px;height:0px;padding:0px;margin:0px auto 0;-webkit-transform:rotate(45deg);-moz-transform:rotate(45deg);-ms-transform:rotate(45deg);-o-transform:rotate(45deg);transform:rotate(45deg);}
 .leaflet-popup-content-wrapper,
-.leaflet-popup-tip{background:#f7f7f7;box-shadow:0 15px 15px 0px rgba(0,0,0,0.4);}
+/* .leaflet-popup-tip{background:#f7f7f7;box-shadow:0 15px 15px 0px rgba(0,0,0,0.4);} */
+.leaflet-popup-tip{background:#f7f7f7; border: 1px solid black;}
 .leaflet-container a.leaflet-popup-close-button{display:none;}
 .leaflet-container a.leaflet-popup-close-button:hover{color:#999;}
 .leaflet-popup-scrolled{overflow:auto;border-bottom:1px solid black;border-top:1px solid black;}
@@ -133,11 +137,27 @@
 .leaflet-oldie .leaflet-popup-tip{border:1px solid #999;}
 .leaflet-div-icon{background:#fff;border:1px solid #666;}
 
-/* ECO MAP
+/* CHANGE CONTROL LAYER ICON
 https://stackoverflow.com/questions/33421720/how-can-i-select-a-specific-instance-of-an-element-inside-a-div-using-css/33421754
-*/
+
 
 .leaflet-control-layers:nth-child(2) a {
     background-image: url(https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-icon-2x.png);
     background-size: 26px 26px;
 }
+
+
+.leaflet-control-layers-toggle:after{ 
+    content:"your text"; 
+    color:#000 ;
+}
+.leaflet-control-layers-toggle{ 
+    width:auto;
+    background-position:3px 50% ;
+    padding:3px;
+    padding-left:36px;
+    text-decoration:none;
+    line-height:36px;
+
+}
+*/

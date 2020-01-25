@@ -25,6 +25,7 @@ class FacetWP_Facet
         elseif ('term_order' == $key && 'tax' == substr( $facet['source'], 0, 3 ) ) {
             $term_ids = get_terms( [
                 'taxonomy' => str_replace( 'tax/', '', $facet['source'] ),
+                'term_order' => true, // Custom flag
                 'fields' => 'ids',
             ] );
 
@@ -59,7 +60,7 @@ class FacetWP_Facet
         // Ignore the current facet's selections
         elseif ( isset( FWP()->or_values ) && ( 1 < count( FWP()->or_values ) || ! isset( FWP()->or_values[ $facet['name'] ] ) ) ) {
             $post_ids = [];
-            $or_values = FWP()->or_values; // Preserve the original
+            $or_values = FWP()->or_values; // Preserve original
             unset( $or_values[ $facet['name'] ] );
 
             $counter = 0;

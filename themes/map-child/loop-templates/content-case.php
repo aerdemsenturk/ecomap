@@ -4,79 +4,234 @@
  *
  * @package understrap
  */
-
 ?>
 
+<div class="toggle-content-close d-none d-lg-block d-md-block d-sm-block">
+	<svg data-toggle="tooltip" title="Hide content" data-placement="left" id="toggleclose" onclick="togglecontent()" viewBox="0 0 64 64" width="25px" height="25px" style="transform: rotate(0deg); fill: currentcolor;" ><path d="M26.7,54.7l-4.5-4.4c-0.4-0.4-0.4-1,0-1.4L38.6,33L22.2,17c-0.4-0.4-0.4-1,0-1.5l4.5-4.4c0.4-0.4,1.1-0.4,1.5,0 l17.1,16.7l4.5,4.4c0.4,0.4,0.4,1,0,1.4L45.2,38L28.2,54.7C27.8,55.1,27.1,55.1,26.7,54.7"></path></svg>
+</div>
+
+<div class="toggle-content-open">
+	<svg data-toggle="tooltip" title="Show content" data-placement="left" id="toggleopen" onclick="togglecontent()" viewBox="0 0 64 64" width="25px" height="25px" style="transform: rotate(180deg); fill: currentcolor;" ><path d="M26.7,54.7l-4.5-4.4c-0.4-0.4-0.4-1,0-1.4L38.6,33L22.2,17c-0.4-0.4-0.4-1,0-1.5l4.5-4.4c0.4-0.4,1.1-0.4,1.5,0 l17.1,16.7l4.5,4.4c0.4,0.4,0.4,1,0,1.4L45.2,38L28.2,54.7C27.8,55.1,27.1,55.1,26.7,54.7"></path></svg>
+</div>
+
+<header class="page-header mt-4 ml-6 d-none d-md-block fixed-left">
+	<?php the_title( '<h4>Case: ', '</h4>' );?>
+</header>
+
 <article <?php post_class(); ?> id="post-<?php the_ID(); ?>">
+	
+	<div class="d-flex no-gutters">
 
-	<div class="toggle-content" onclick="togglecontent()">↵</div>
+		<div class="flex-fill">
+			<?php echo GeoMashup::map('map_content=single&add_map_type_control=true');?>
+		</div>
 
-	<div class="entry-content">
-		
-		<div class="d-flex">
+		<div class="scroll-area col-12 col-lg-6 col-md-6 col-sm-6 col-xs-6" id="toggle">
 
-			<div class="col-12 col-lg-6 col-md-12 col-sm-12 pr-4 scroll-area" id="toggle">	
-				
-				<?php the_title( '<h1 class="entry-title">', '</h1>' ); ?>
-				
-				<p>
-				<?php
-					// Farklı yöntem
-					// echo get_the_term_list( $post->ID, 'case_type', '● ', ', ' ); 
+			<header class="entry-header p-3 border-left">
 
+				<?php		
+					if ( has_post_thumbnail() ) {
+						the_post_thumbnail();
+					}
+					else {
+						// Default image
+						echo '<img src="' . get_bloginfo( 'stylesheet_directory' ) . '/css/images/default-image-bg.svg" height="300px"/>';
+					}
+				?>
+
+				<small>
+					<?php echo get_the_date('Y'); ?>
+				</small>
+				⎯
+				<small>
+					<?php
 					$case_type = get_the_terms( $post->ID,  'case_type' );
 					if ( ! empty( $case_type ) ) {
 						if ( ! is_wp_error( $case_type ) ) {
 								foreach( $case_type as $type ) {
-									echo '<small><a href="' . get_term_link( $type->slug, 'case_type' ) . '">●&nbsp;' . esc_html( $type->name ) . '&nbsp;</a></small>'; 
+									echo '<a href="' . get_term_link( $type->slug, 'case_type' ) . '">' . esc_html( $type->name ) . '</a>'; 
 								}
 						}
 					}
-				?>
-				</p>
+					?>
+				</small>
+				<?php the_title( '<h4>', '</h4>' );?>	
+			</header>
+			
+			<div class="entry-content border-left">
 
-				<?php the_content(); ?>
-
-				<!-- <?php if( get_field('spatial_country') ): ?>
-				<?php the_field('spatial_country'); ?>, 
-				<?php endif; ?>
-
-				<?php if( get_field('spatial_region') ): ?>
-				<?php the_field('spatial_region'); ?>, 
-				<?php endif; ?>
-
-				<?php if( get_field('spatial_city') ): ?>
-				<?php the_field('spatial_city'); ?>
-				<?php endif; ?> -->
-
-				</br>
-
-				<?php the_field('geo_address'); ?>
-				
-				</br>
-
-				<?php if( get_field('temporal_start') ): ?>
-				<?php the_field('temporal_start'); ?> — 
-				<?php endif; ?>
-
-				<?php if( get_field('temporal_end') ): ?>
-				<?php the_field('temporal_end'); ?>			
-				<?php else : ?>
-					TODAY
-				<?php endif; ?>
-
-				<!-- <?php 
-				// get raw date
-				$date = get_field('temporal_start', false, false);
-				// make date object
-				$date = new DateTime($date);
-				?>
-				</br>
-				<?php echo $date->format('j M Y'); ?> — <?php echo date("j M Y");?> -->
-
+				<!--time and Content -->
 				<div class="row">
-					<!--COMMODITY-->
-					<div class="col-lg-12 col-md-12 col-sm-12 col-12">
+
+					<div class="col-12 p-3 mb-3">
+
+						<!-- <p>
+						<?php if( get_field('temporal_start') ): ?>
+						<?php the_field('temporal_start'); ?> —
+						<?php else : ?>
+							? —
+						<?php endif; ?>
+
+						<?php if( get_field('temporal_end') ): ?>
+						<?php the_field('temporal_end'); ?>			
+						<?php else : ?>
+							TODAY
+						<?php endif; ?>
+						</p> -->
+
+						<?php the_content(); ?>
+
+					</div>
+
+					<!-- <?php if( get_field('spatial_country') ): ?>
+					<?php the_field('spatial_country'); ?>, 
+					<?php endif; ?>
+
+					<?php if( get_field('spatial_region') ): ?>
+					<?php the_field('spatial_region'); ?>, 
+					<?php endif; ?>
+
+					<?php if( get_field('spatial_city') ): ?>
+					<?php the_field('spatial_city'); ?>
+					<?php endif; ?> -->
+				
+				</div>
+
+				<!--NEW ACTOR POST TYPE VERSION. OLD VERSION: https://trello.com/c/D0THOFCk -->
+				<div class="row border-top">
+					
+					<div class="col-12 pt-5 pb-5 pl-3 pr-4 mt-3">
+							<h4>ACTORS</h4>
+					</div>
+
+					<?php if( $posts ): ?>	
+					<?php foreach( $posts as $post ): ?>
+						
+					<?php 
+					$actors_pro = get_field('actor_relations_pro');
+					$actors_contra = get_field('actor_relations_contra');
+					?>
+
+					<?php if( $actors_pro ): ?>
+
+						<div class="col-6 pt-5 pb-5 pl-3 pr-3">
+							<p>Pro</p>
+							<ul>
+							<?php foreach( $actors_pro as $actor_pro ): ?>
+								<li>
+									<a href="<?php echo get_permalink( $actor_pro->ID ); ?>">
+										<?php echo get_the_title( $actor_pro->ID ); ?>
+									</a>
+									<small>
+									<?php
+										// Basit yöntem
+										echo get_the_term_list( $actor_pro->ID, 'actor_type', '', ', ' );
+										echo get_the_term_list( $actor_pro->ID, 'actor_country', ' - ', ', ' ); 
+
+										// Başka yöntem
+
+										// $actor_type = get_the_terms( $actor_contra->ID,  'actor_type' );
+										// if ( ! empty( $actor_type ) ) {
+										// 	if ( ! is_wp_error( $actor_type ) ) {
+										// 			foreach( $actor_type as $type ) {
+										// 				echo '<small><a href="' . get_term_link( $type->slug, 'actor_type' ) . '">●&nbsp;' . esc_html( $type->name ) . '&nbsp;</a></small>'; 
+										// 			}
+										// 	}
+										// }
+									?>
+									</small>
+								</li>
+							<?php endforeach; ?>
+							</ul>
+						</div>
+
+					<?php endif; ?>
+
+					<?php if( $actors_contra ): ?>
+						<div class="col-6 pt-5 pb-5 pl-3 pr-3">
+							<p>Con</p>
+							<ul>
+							<?php foreach( $actors_contra as $actor_contra ): ?>
+								<li>
+									<a href="<?php echo get_permalink( $actor_contra->ID ); ?>">
+										<?php echo get_the_title( $actor_contra->ID ); ?>
+									</a>
+									<small>
+									<?php
+										// Basit yöntem
+										echo get_the_term_list( $actor_contra->ID, 'actor_type', '', ', ' );
+										echo get_the_term_list( $actor_contra->ID, 'actor_country', ' - ', ', ' ); 
+
+										// Başka yöntem
+
+										// $actor_type = get_the_terms( $actor_contra->ID,  'actor_type' );
+										// if ( ! empty( $actor_type ) ) {
+										// 	if ( ! is_wp_error( $actor_type ) ) {
+										// 			foreach( $actor_type as $type ) {
+										// 				echo '<small><a href="' . get_term_link( $type->slug, 'actor_type' ) . '">●&nbsp;' . esc_html( $type->name ) . '&nbsp;</a></small>'; 
+										// 			}
+										// 	}
+										// }
+									?>
+									</small>
+								</li>
+							<?php endforeach; ?>
+							</ul>
+						</div>
+					<?php endif; ?>
+						
+					<?php endforeach; ?>
+					<?php endif; ?>
+				</div>
+
+				<!--NEW IMPACT VERSION. OLD VERSION: https://trello.com/c/rYLM5I8E -->
+				<div class="row border-top">
+					
+					<div class="col-12 pt-5 pb-5">
+							<h4>IMPACTS</h4>
+					</div>
+
+					<?php $visible_impact_terms = get_field( 'visible_impact' ); ?>
+					<?php if ( $visible_impact_terms ): ?>
+						<div class="col-6 pb-5 pt-5 pl-3 pr-3">
+
+							<p>Visible</p>
+							<ul>
+								<?php foreach ( $visible_impact_terms as $visible_impact_term ): ?>
+								
+								<?php $term_type = get_field('impact_type', 'impact_' . $visible_impact_term->term_id . '' ); ?>
+								<li><a href="<?php echo get_term_link( $visible_impact_term ) ?>"><?php echo $visible_impact_term->name; ?></a> - <small><?php echo $term_type; ?></small></li>
+								
+								<?php endforeach; ?>
+							</ul>
+						</div>
+					<?php endif; ?>
+						
+					<?php $potential_impact_terms = get_field( 'potential_impact' ); ?>
+					<?php if ( $potential_impact_terms ): ?>
+						<div class="col-6 pb-5 pt-5 pl-3 pr-3">
+							<p>Potential</p>
+							<ul>
+								<?php foreach ( $potential_impact_terms as $potential_impact_term ): ?>
+								
+								<?php $term_type = get_field('impact_type', 'impact_' . $potential_impact_term->term_id . '' ); ?>
+								<li><a href="<?php echo get_term_link( $potential_impact_term ) ?>"><?php echo $potential_impact_term->name; ?></a> - <small><?php echo $term_type; ?></small></li>
+								
+								<?php endforeach; ?>
+							</ul>
+						</div>
+					<?php endif; ?>
+				</div>
+
+				<!--COMMODITY-->
+				<div class="row border-top">
+					
+					<div class="col-12 pt-5 pb-5">
+						<h4>COMMODITY</h4>
+					</div>
+					
+					<div class="col-12 pt-5 pb-5">
 
 						<?php	
 						$types = get_terms( array( 
@@ -101,169 +256,16 @@
 
 					</div>
 
-					<!--OLD ACTORS PRO CONTRA GROUP VERSION https://trello.com/c/D0THOFCk -->
-					<!--NEW ACTOR POST TYPE VERSION -->
+				</div>
 
-					<?php if( $posts ): ?>	
-					<?php foreach( $posts as $post ): ?>
-						<div class="col-12 mt-5 mb-3">
-							<?php 
-							$actors_pro = get_field('actor_relations_pro');
-							$actors_contra = get_field('actor_relations_contra');
-							?>
-
-							<?php if( $actors_pro ): ?>
-								<h4>ACTORS PRO</h4>
-								<ul>
-								<?php foreach( $actors_pro as $actor_pro ): ?>
-									<li>
-										<a href="<?php echo get_permalink( $actor_pro->ID ); ?>">
-											<?php echo get_the_title( $actor_pro->ID ); ?>
-										</a>
-										<small>
-										<?php
-											// Basit yöntem
-											echo get_the_term_list( $actor_pro->ID, 'actor_type', '', ', ' );
-											echo get_the_term_list( $actor_pro->ID, 'actor_country', ' - ', ', ' ); 
-
-											// Başka yöntem
-
-											// $actor_type = get_the_terms( $actor_contra->ID,  'actor_type' );
-											// if ( ! empty( $actor_type ) ) {
-											// 	if ( ! is_wp_error( $actor_type ) ) {
-											// 			foreach( $actor_type as $type ) {
-											// 				echo '<small><a href="' . get_term_link( $type->slug, 'actor_type' ) . '">●&nbsp;' . esc_html( $type->name ) . '&nbsp;</a></small>'; 
-											// 			}
-											// 	}
-											// }
-										?>
-										</small>
-									</li>
-								<?php endforeach; ?>
-								</ul>
-							<?php endif; ?>
-
-							<?php if( $actors_contra ): ?>
-								<h4>ACTORS CONTRA</h4>
-								<ul>
-								<?php foreach( $actors_contra as $actor_contra ): ?>
-									<li>
-										<a href="<?php echo get_permalink( $actor_contra->ID ); ?>">
-											<?php echo get_the_title( $actor_contra->ID ); ?>
-										</a>
-										<small>
-										<?php
-											// Basit yöntem
-											echo get_the_term_list( $actor_contra->ID, 'actor_type', '', ', ' );
-											echo get_the_term_list( $actor_contra->ID, 'actor_country', ' - ', ', ' ); 
-
-											// Başka yöntem
-
-											// $actor_type = get_the_terms( $actor_contra->ID,  'actor_type' );
-											// if ( ! empty( $actor_type ) ) {
-											// 	if ( ! is_wp_error( $actor_type ) ) {
-											// 			foreach( $actor_type as $type ) {
-											// 				echo '<small><a href="' . get_term_link( $type->slug, 'actor_type' ) . '">●&nbsp;' . esc_html( $type->name ) . '&nbsp;</a></small>'; 
-											// 			}
-											// 	}
-											// }
-										?>
-										</small>
-									</li>
-								<?php endforeach; ?>
-								</ul>
-							<?php endif; ?>
-						</div>
-					<?php endforeach; ?>
-					<?php endif; ?>
-
-					<!--IMPACT GROUPED-->
-					<div class="col-12">
-						<h4>IMPACT</h4>
-					</div>
-
-					<div class="col-12 mt-5 mb-3">
-						<ul>
-							<?php
-								if (have_rows('impact_visible')) {
-									while (have_rows('impact_visible')) {
-
-										the_row();
-										$healths = get_sub_field('impact_visible_health');
-										$socials = get_sub_field('impact_visible_social');
-										$environmentals = get_sub_field('impact_visible_environmental');
-
-										if( $healths ):
-
-										foreach ($healths as $health) {			
-											echo '<li><a href="' . get_term_link( $health ) . '">' . $health->name . '</a> - <i> Health </i></li>';
-										}
-
-										endif;
-										if( $socials ):
-
-										foreach ($socials as $social) {
-											echo '<li><a href="' . get_term_link( $social ) . '">' . $social->name . '</a> - <i> Social </i></li>';
-										}
-
-										endif;
-										if( $environmentals ):
-
-										foreach ($environmentals as $environmental) {
-											echo '<li><a href="' . get_term_link( $environmental ) . '">' . $environmental->name . '</a> - <i> Ennvironmental </i></li>';
-										}
-		
-										endif;
-									}
-								}
-							?>
-						</ul>
-					</div>
-
-					<div class="col-12 mt-5 mb-3">
-						<ul>
-							<?php
-								if (have_rows('impact_potential')) {
-									while (have_rows('impact_potential')) {
-
-										the_row();
-										$healths = get_sub_field('impact_potential_health');
-										$socials = get_sub_field('impact_potential_social');
-										$environmentals = get_sub_field('impact_potential_environmental');
-
-										if( $healths ):
-
-										foreach ($healths as $health) {			
-											echo '<li><a href="' . get_term_link( $health ) . '">' . $health->name . '</a> - <i> Health </i></li>';
-										}
-
-										endif;
-										if( $socials ):
-
-										foreach ($socials as $social) {
-											echo '<li><a href="' . get_term_link( $social ) . '">' . $social->name . '</a> - <i> Social </i></li>';
-										}
-
-										endif;
-										if( $environmentals ):
-
-										foreach ($environmentals as $environmental) {
-											echo '<li><a href="' . get_term_link( $environmental ) . '">' . $environmental->name . '</a> - <i> Ennvironmental </i></li>';
-										}
-		
-										endif;
-									}
-								}
-							?>
-						</ul>
-					</div>
+				<div class="row border-top">
 
 					<!--TIMELINE CASE ARCHIVE-->
-					<div class="col-12 mt-5 mb-3">
-
-						<?php if( have_rows('case_timeline') ): ?>
-							<h4>TIMELINE</h4>
-							<ul class="timeline">
+					
+					<?php if( have_rows('case_timeline') ): ?>
+						<div class="col-12 pt-5 pb-5 border-top">
+							<h4>TIMELINE</h4>								
+							<ul class="timeline mt-5">
 
 								<?php while( have_rows('case_timeline') ): the_row(); 
 									// vars
@@ -307,18 +309,17 @@
 								<?php endwhile; ?>
 
 							</ul>
-						<?php endif; ?>
+						</div>
+					<?php endif; ?>
 
-					</div>
 					<!--DOCUMENTATION CASE ARCHIVE-->
-					<div class="col-12 mt-5 mb-3">   
 
-						<?php if( have_rows('case_documents') ): ?>
-
-							<div class="mb-3 ">
-								<h4>DOCUMENTATION</h4>
-							</div>
-
+					<?php if( have_rows('case_documents') ): ?>
+						<div class="col-12 pt-5 pb-5 border-top">
+							<h4>DOCUMENTATION</h4>
+						</div>
+						
+						<div class="col-12 pt-5 pl-3">			
 							<ul>
 
 								<?php while( have_rows('case_documents') ): the_row(); 
@@ -342,25 +343,21 @@
 								<?php endwhile; ?>
 
 							</ul>
-
-						<?php endif; ?>
-
-					</div>		
+						</div>
+					<?php endif; ?>
 					
 					<!--ENTRY META-->
-					<div class="col-lg-12 col-md-12 col-sm-12 col-12">
-						<div class="entry-meta">
-							<small><b>Editör </b><?php the_author_posts_link(); ?></small>
-							<small><b> Son güncelleme </b><?php the_modified_time( 'j F Y' ); ?></small>
-							<h1><?php do_action('back_button'); ?></h1>
-						</div>
+					<div class="col-12 mt-5 mb-5  entry-meta">
+						<small><b>Editor </b><?php the_author_posts_link(); ?></small>
+						<small><b> Last Update </b><?php the_modified_time( 'j F Y' ); ?></small>
 					</div>
+
+					<div class="toggle-content-back">
+						<?php do_action('back_button'); ?>
+					</div>
+
 				</div>
-
-			</div>
-
-			<div class="flex-fill">
-				<?php echo GeoMashup::map('map_content=single&add_map_type_control=true');?>
+				
 			</div>
 
 		</div>
@@ -371,34 +368,48 @@
 
 <script type="text/javascript">
 
-// js version
+	// Toggle content js version
+	function togglecontent() {
 
-function togglecontent() {
-  var x = document.getElementById("toggle");
-	if (x.style.display === "none") {
-		x.style.display = "block";
-	} else {
-		x.style.display = "none";
-	}
-}
+		var x = document.getElementById("toggle");
+		if (x.style.display === "none") {
+			x.style.display = "block";
+		} else {
+			x.style.display = "none";
+        }
 
-//Tooltip 
-jQuery(function () {
-	jQuery('[data-toggle="tooltip"]').tooltip(
-		{
-		placement: 'right', 
-		animation: false, //https://github.com/twbs/bootstrap/issues/21607#issuecomment-309634023
+        var togglebutton = document.getElementById("toggleclose");
+		if (togglebutton.style.display === "none") {
+			togglebutton.style.display = "block";
+		} else {
+			togglebutton.style.display = "none";
+        }
+
+        var togglebutton = document.getElementById("backbutton");
+		if (togglebutton.style.display === "none") {
+			togglebutton.style.display = "block";
+		} else {
+			togglebutton.style.display = "none";
+        }
+
+        var togglebutton = document.getElementById("toggleopen");
+		if (togglebutton.style.display === "block") {
+			togglebutton.style.display = "none";
+		} else {
+			togglebutton.style.display = "block";
 		}
-	)
-})
+    }
 
-// jQuery version
-
-// jQuery(document).ready(function(){
-//   jQuery("button").click(function(){
-//     jQuery("#toggle").toggle(500);
-//   });
-// });
+	// Tooltip 
+	jQuery(function () {
+		jQuery('[data-toggle="tooltip"]').tooltip(
+			{
+			// placement: 'bottom', 
+            html: true,
+			animation: true, //https://github.com/twbs/bootstrap/issues/21607#issuecomment-309634023
+			}
+		)
+	})
 
 </script>
 

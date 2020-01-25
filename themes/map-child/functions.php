@@ -1,8 +1,8 @@
 <?php
 
 function understrap_remove_scripts() {
-wp_dequeue_style( 'understrap-styles' );
-wp_deregister_style( 'understrap-styles' );
+// wp_dequeue_style( 'understrap-styles' );
+// wp_deregister_style( 'understrap-styles' );
 
 wp_dequeue_script( 'understrap-scripts' );
 wp_deregister_script( 'understrap-scripts' );
@@ -11,8 +11,7 @@ wp_deregister_script( 'understrap-scripts' );
 function theme_enqueue_styles() {
 // Get the theme data
 $the_theme = wp_get_theme();
-
-wp_enqueue_style( 'child-understrap-styles', get_stylesheet_directory_uri() . '/css/child-theme.min.css', array(), $the_theme->get( 'Version' ) );
+// wp_enqueue_style( 'child-understrap-styles', get_stylesheet_directory_uri() . '/css/child-theme.min.css', array(), $the_theme->get( 'Version' ) );
 wp_enqueue_script( 'child-understrap-scripts', get_stylesheet_directory_uri() . '/js/child-theme.min.js', array(), $the_theme->get( 'Version' ), true );
 }
 
@@ -33,19 +32,19 @@ wp_enqueue_style( 'eko_style', get_stylesheet_directory_uri(). '/css/eko-style.c
 * Delete taxonomy name title
 ************/
 
-function as_archive_title( $title ) 
-{
-    if ( is_category() ) 
-    {
-        $title = single_cat_title( '', false );
-    } elseif ( is_tag() ) {
-        $title = single_tag_title( '', false );
-    } elseif ( is_tax() ) {
-        $title = single_term_title( '', false );
-    }
-    return $title;
-}
-add_filter( 'get_the_archive_title', 'as_archive_title' );
+// function as_archive_title( $title ) 
+// {
+//     if ( is_category() ) 
+//     {
+//         $title = single_cat_title( '', false );
+//     } elseif ( is_tag() ) {
+//         $title = single_tag_title( '', false );
+//     } elseif ( is_tax() ) {
+//         $title = single_term_title( '', false );
+//     }
+//     return $title;
+// }
+// add_filter( 'get_the_archive_title', 'as_archive_title' );
 
 /*********
 * Back button
@@ -55,8 +54,8 @@ function wp_back_button()
 {
     if ( wp_get_referer() )
     {
-        $back_text = __( '←' );
-        $button    = "\n<button type='button' class='btn btn-outline-primary btn-md' onclick='javascript:history.back()'>$back_text</button>";
+        $back_text = __( '↩' );
+        $button    = "\n<h3><a id='backbutton' data-toggle='tooltip' title='Back' href='#' data-placement='left' onclick='javascript:history.go(-1);event.preventDefault();'>$back_text</a><h3>";
         echo ( $button );
     }
 }
@@ -66,14 +65,14 @@ add_action( 'back_button', 'wp_back_button' );
 * Gallery Defaults
 ************/
 
-add_filter( 'shortcode_atts_gallery',
-    function( $out )
-    {
-        $out['link'] = 'file';
-        $out['size'] = 'medium';
-        return $out;
-    }
-);
+// add_filter( 'shortcode_atts_gallery',
+//     function( $out )
+//     {
+//         $out['link'] = 'file';
+//         $out['size'] = 'medium';
+//         return $out;
+//     }
+// );
 
 /*********
 * Remove Emoji Codes
@@ -139,11 +138,11 @@ add_action('wp_footer', 'buffer_end');
 * Add title to <a> in [gallery] shortcode.
 ************/
 
-function as_get_attachment_link( $output, $id ) {
-	$attachment = get_post( $id );
-	return str_replace( '<a', "<a title='{$attachment->post_excerpt}'", $output );
-}
-add_filter( 'wp_get_attachment_link', 'as_get_attachment_link', 10, 2 );
+// function as_get_attachment_link( $output, $id ) {
+// 	$attachment = get_post( $id );
+// 	return str_replace( '<a', "<a title='{$attachment->post_excerpt}'", $output );
+// }
+// add_filter( 'wp_get_attachment_link', 'as_get_attachment_link', 10, 2 );
 
 /*********
 * Customize excerpt and read more 
@@ -156,15 +155,51 @@ function custom_excerpt_length( $length ) {
 }
 add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
 
-// READ MORE LINK
+/*********
+* READ MORE
+************/
+
 add_filter( 'wp_trim_excerpt', 'understrap_all_excerpts_get_more_link' );
 
 if ( ! function_exists( 'understrap_all_excerpts_get_more_link' ) ) {
 
 	function understrap_all_excerpts_get_more_link( $post_excerpt ) {
 		if ( ! is_admin() ) {
-			$post_excerpt = $post_excerpt . '...<h3><a class="understrap-read-more-link" title="Tüm detayları göster" data-toggle="tooltip" data-placement="right" href="' . esc_url( get_permalink( get_the_ID() ) ) . '">' . __( '↳', 'understrap' ) . '</a></h3>';
+			$post_excerpt = $post_excerpt . '...<p><a href="' . esc_url( get_permalink( get_the_ID() ) ) . '">' . __( 'See case →' ) . '</a></p>';
 		}
 		return $post_excerpt;
 	}
+}
+
+/*********
+* GUTENBERG
+************/
+
+function custom_admin_css() {
+    echo '<style type="text/css">
+    .wp-block { max-width: 1300px; }
+    </style>';
+    }
+    add_action('admin_head', 'custom_admin_css');
+    
+/*********
+* ACF DEFAULT IMAGE
+************/
+
+add_action('acf/render_field_settings/type=image', 'add_default_value_to_image_field');
+    function add_default_value_to_image_field($field) {
+    acf_render_field_setting( $field, array(
+        'label'			=> 'Default Image',
+        'instructions'		=> 'Appears when creating a new post',
+        'type'			=> 'image',
+        'name'			=> 'default_value',
+    ));
+}
+
+add_action('admin_enqueue_scripts', 'enqueue_uploader_for_image_default');
+    function enqueue_uploader_for_image_default() {
+    $screen = get_current_screen();
+        if ($screen && $screen->id && ($screen->id == 'acf-field-group')) {
+            acf_enqueue_uploader();
+    }
 }

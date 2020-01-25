@@ -75,10 +75,6 @@ class FacetWP_Display
                 $output .= $preload_data['template'];
                 $output .= '</div>';
 
-                if ( apply_filters( 'facetwp_use_pager_seo', false ) ) {
-                    $output .= $this->get_pager_seo();
-                }
-
                 $this->load_assets = true;
             }
         }
@@ -109,39 +105,25 @@ class FacetWP_Display
 
 
     /**
-     * Build a basic hidden pager for SEO purposes
-     */
-    function get_pager_seo() {
-        $page = FWP()->facet->pager_args['page'];
-        $total_pages = FWP()->facet->pager_args['total_pages'];
-        $url_var = FWP()->helper->get_setting( 'prefix' ) . 'paged';
-
-        $prev_link = ( 2 === $page ) ? remove_query_arg( $url_var ) : add_query_arg( $url_var, $page - 1 );
-        $next_link = add_query_arg( $url_var, $page + 1 );
-        $output = '';
-
-        if ( 1 < $total_pages ) {
-            $output .= ( 1 < $page ) ? '<a href="' . esc_url( $prev_link ) . '">Prev</a>' : '';
-            $output .= ( $page < $total_pages ) ? '<a href="' . esc_url( $next_link ) . '">Next</a>' : '';
-            $output = '<div class="facetwp-seo">' . $output . '</div>';
-        }
-
-        return $output;
-    }
-
-
-    /**
      * Output facet scripts
      */
     function front_scripts() {
 
         // Not enqueued - front.js needs to load before front_scripts()
-        if ( true === apply_filters( 'facetwp_load_assets', $this->load_assets ) ) {
-            if ( true === apply_filters( 'facetwp_load_css', true ) ) {
+        if ( apply_filters( 'facetwp_load_assets', $this->load_assets ) ) {
+
+            // Load CSS?
+            if ( apply_filters( 'facetwp_load_css', true ) ) {
                 $this->assets['front.css'] = FACETWP_URL . '/assets/css/front.css';
             }
 
+            // Load required JS
             $this->assets['front.js'] = FACETWP_URL . '/assets/js/dist/front.min.js';
+
+            // Load a11y?
+            if ( apply_filters( 'facetwp_load_a11y', false ) ) {
+                $this->assets['accessibility.js'] = FACETWP_URL . '/assets/js/src/accessibility.js';
+            }
 
             // Use the REST API?
             $ajaxurl = admin_url( 'admin-ajax.php' );

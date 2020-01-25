@@ -29,10 +29,8 @@
             abbr = '';
 
         if ( -1 < format.indexOf( 'a' ) ) {
-            // Kısaltmaları kaldır
-            // var abbrevs = [ 'K', 'M', 'B', 't', 'q', 'Q' ];
-            var abbrevs = [ '', '', '', '', '', '' ];
-            var exp = Math.floor( Math.log10( Math.abs( value ) ) );
+            var abbrevs = [ 'K', 'M', 'B', 't', 'q', 'Q' ];
+            var exp = Math.floor( Math.log( Math.abs( value ) ) * Math.LOG10E ); // log10 polyfill
             var nearest_exp = ( exp - ( exp % 3 ) ); // nearest exponent divisible by 3
 
             if ( 3 <= exp ) {
@@ -62,9 +60,7 @@
         decimalStr = valueStr.split( '.' )[1] || '';
 
         // Handle decimals
-        // Noktayı kaldır
-        // decimalStr = ( 0 < precision && '' != decimalStr ) ? '.' + decimalStr : '';
-        decimalStr = ( 0 < precision && '' != decimalStr ) ? '' + decimalStr : '';
+        decimalStr = ( 0 < precision && '' != decimalStr ) ? '.' + decimalStr : '';
 
         // Use thousands separators
         if ( -1 < format.indexOf( ',' ) ) {

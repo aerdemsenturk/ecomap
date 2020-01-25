@@ -78,6 +78,11 @@ class FacetWP_Overrides
             $is_main_query = false;
         }
 
+        // Ignore the "WP GDPR Compliance" plugin
+        if ( '[wpgdprc_access_request_form]' == $query->get( 's' ) ) {
+            $is_main_query = false;
+        }
+
         return $is_main_query;
     }
 }

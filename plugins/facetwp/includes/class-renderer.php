@@ -236,24 +236,27 @@ class FacetWP_Renderer
             $output['counts'] = $this->get_result_count( $pager_args );
         }
 
-        // Skip facet updates when sorting or paginating
-        if ( 0 < $params['soft_refresh'] ) {
-            return apply_filters( 'facetwp_render_output', $output, $params );
-        }
+        // Not paging or sorting
+        if ( 0 == $params['soft_refresh'] ) {
+            $output['settings']['num_choices'] = [];
 
-        // Fill "num_choices" (intentionally added after soft_refresh)
-        $output['settings']['num_choices'] = [];
-
-        // Display the sort control
-        if ( isset( $params['extras']['sort'] ) ) {
-            $output['sort'] = $this->get_sort_html();
+            // Display the sort box
+            if ( isset( $params['extras']['sort'] ) ) {
+                $output['sort'] = $this->get_sort_html();
+            }
         }
 
         // Get facet data
         foreach ( $this->facets as $facet_name => $the_facet ) {
             $facet_type = $the_facet['type'];
 
+            // Invalid facet type
             if ( ! isset( $this->facet_types[ $facet_type ] ) ) {
+                continue;
+            }
+
+            // Skip facets when paging or sorting
+            if ( 0 < $params['soft_refresh'] && 'pager' != $facet_type ) {
                 continue;
             }
 
@@ -453,20 +456,24 @@ class FacetWP_Renderer
             // Required for dropdowns and checkboxes in "or" mode
             FWP()->or_values[ $facet_name ] = $matches;
 
-            // Preserve post ID order for search facets
             if ( 'search' == $facet_type ) {
                 $this->is_search = true;
-                $intersected_ids = [];
-                foreach ( $matches as $match ) {
-                    if ( in_array( $match, $post_ids ) ) {
-                        $intersected_ids[] = $match;
-                    }
+            }
+
+            // For search facets, loop through $matches to set order
+            // For other facets, loop through $post_ids to preserve the existing order
+            $needles = ( 'search' == $facet_type ) ? $matches : $post_ids;
+            $haystack = ( 'search' == $facet_type ) ? $post_ids : $matches;
+            $haystack = array_flip( $haystack );
+            $intersected_ids = [];
+
+            foreach ( $needles as $post_id ) {
+                if ( isset( $haystack[ $post_id ] ) ) {
+                    $intersected_ids[] = $post_id;
                 }
-                $post_ids = $intersected_ids;
             }
-            else {
-                $post_ids = array_intersect( $post_ids, $matches );
-            }
+
+            $post_ids = $intersected_ids;
         }
 
         // Return a zero array if no matches

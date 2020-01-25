@@ -105,7 +105,10 @@ window.FWP = window.FWP || {};
 
     FWP.helper.detect_loop = function(node) {
         var curNode = null;
-        var iterator = document.createNodeIterator(node, NodeFilter.SHOW_COMMENT, FWP.helper.node_filter, false);
+        var iterator = document.createNodeIterator(node, NodeFilter.SHOW_COMMENT, function() {
+            return NodeFilter.FILTER_ACCEPT; /* IE expects a function */
+        }, false);
+
         while (curNode = iterator.nextNode()) {
             if (8 === curNode.nodeType && 'fwp-loop' === curNode.nodeValue) {
                 return curNode.parentNode;
@@ -113,11 +116,6 @@ window.FWP = window.FWP || {};
         }
 
         return false;
-    }
-
-
-    FWP.helper.node_filter = function() {
-        return NodeFilter.FILTER_ACCEPT;
     }
 
 
@@ -491,34 +489,50 @@ window.FWP = window.FWP || {};
     }
 
 
-    FWP.reset = function(facet_name, facet_value) {
-        FWP.parse_facets();
+    FWP.reset = function(facets) {
+        FWP.parse_facets;
 
-        if (isset(facet_name)) {
-            var values = FWP.facets[facet_name];
-            if (isset(facet_value) && values.length > 1) {
-                var arr_idx = values.indexOf(facet_value);
-                if (-1 < arr_idx) {
-                    values.splice(arr_idx, 1);
-                    FWP.facets[facet_name] = values;
-                }
+        var opts = {};
+
+        if ('string' === typeof facets) {
+            opts[facets] = '';
+        }
+        else if (Array.isArray(facets)) {
+            $.each(facets, function(key, facet_name) {
+                opts[facet_name] = '';
+            });
+        }
+        else if ('object' === typeof facets && !! facets) {
+            opts = facets;
+        }
+
+        var reset_all = Object.keys(opts).length < 1;
+
+        $.each(FWP.facets, function(facet_name, vals) {
+            var has_reset = isset(opts[facet_name]);
+            var selected_vals = Array.isArray(vals) ? vals : [vals];
+
+            if (has_reset && -1 < selected_vals.indexOf(opts[facet_name])) {
+                var pos = selected_vals.indexOf(opts[facet_name]);
+                selected_vals.splice(pos, 1); // splice() is mutable!
+                FWP.facets[facet_name] = selected_vals;
             }
-            else {
-                FWP.facets[facet_name] = [];
+
+            if (has_reset && (selected_vals.length < 1 || '' === opts[facet_name])) {
                 delete FWP.frozen_facets[facet_name];
             }
-        }
-        else {
-            $.each(FWP.facets, function(f) {
-                FWP.facets[f] = [];
-            });
 
+            if (reset_all || (has_reset && '' === opts[facet_name])) {
+                FWP.facets[facet_name] = [];
+            }
+        });
+
+        if (reset_all) {
             FWP.extras.sort = 'default';
             FWP.frozen_facets = {};
         }
 
         FWP.hooks.doAction('facetwp/reset');
-
         FWP.is_reset = true;
         FWP.refresh();
     }
@@ -618,7 +632,9 @@ window.FWP = window.FWP || {};
             var facet_value = $(this).attr('data-value');
 
             if ('' != facet_value) {
-                FWP.reset(facet_name, facet_value);
+                var obj = {};
+                obj[facet_name] = facet_value;
+                FWP.reset(obj);
             }
             else {
                 FWP.reset(facet_name);
@@ -626,7 +642,7 @@ window.FWP = window.FWP || {};
         });
 
         // Pagination
-        $(document).on('click', '.facetwp-page', function() {
+        $(document).on('click', '.facetwp-page[data-page]', function() {
             $('.facetwp-page').removeClass('active');
             $(this).addClass('active');
 
